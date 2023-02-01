@@ -1,3 +1,4 @@
+from flask import Flask
 import ccxt
 import pandas as pd
 pd.set_option('display.max_columns', None) ## 모든 열을 출력한다.
@@ -227,21 +228,26 @@ def stop(update, context):
     sched.remove_job(job_id='send')
     sched.remove_all_jobs()
 
+app = Flask(__name__)
 
-bot = telegram.Bot(BOT_TOKEN)
-sched = BackgroundScheduler()
+@app.route('/')
+def main():
+    bot = telegram.Bot(BOT_TOKEN)
+    sched = BackgroundScheduler()
 
-bot.send_message(chat_id=MY_ID, text='안녕하세요!! \n 작업을 시작하고플땐 /hstart \n 작업을 중지하고플땐 /stop \n 메세지를 전송해주세요.😄')
+    bot.send_message(chat_id=MY_ID, text='안녕하세요!! \n 작업을 시작하고플땐 /hstart \n 작업을 중지하고플땐 /stop \n 메세지를 전송해주세요.😄')
 
-updater = Updater(token=BOT_TOKEN, use_context=True)
-dispatcher = updater.dispatcher
+    updater = Updater(token=BOT_TOKEN, use_context=True)
+    dispatcher = updater.dispatcher
 
-start_handler = CommandHandler('hstart', start)
-stop_handler = CommandHandler('stop', stop)
+    start_handler = CommandHandler('hstart', start)
+    stop_handler = CommandHandler('stop', stop)
 
-dispatcher.add_handler(start_handler)
-dispatcher.add_handler(stop_handler)
+    dispatcher.add_handler(start_handler)
+    dispatcher.add_handler(stop_handler)
 
-updater.start_polling()
-updater.idle()
+    updater.start_polling()
+    updater.idle()
 
+if __name__ =='__main__':
+    app.run()
